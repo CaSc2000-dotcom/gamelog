@@ -12,7 +12,7 @@ Clone the repo, open the folder with your favorite terminal, and run `npm run de
 
 ## Live URL
 
-[TBD]
+https://gamelog-virid.vercel.app/ 
 
 ## License
 
