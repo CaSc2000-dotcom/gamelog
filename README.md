@@ -8,11 +8,14 @@ Next.js (App Router) + TypeScript + Tailwind + shadcn/ui, on Vercel, backed by S
 
 ## Local-Run Instructions
 
-Clone the repo, open the folder with your favorite terminal, and run `npm run dev`.
+1. `git clone https://github.com/CaSc2000-dotcom/gamelog.git`
+2. `cd gamelog && npm install`
+3. Copy `.env.example` to `.env.local` and fill in your Supabase credentials
+4. `npm run dev` — open http://localhost:3000
 
 ## Live URL
 
-[TBD]
+https://gamelog-cs.vercel.app/
 
 ## License
 
