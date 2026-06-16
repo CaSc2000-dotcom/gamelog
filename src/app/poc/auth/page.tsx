@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { AuthButtons } from "./auth-buttons";
+import { AuthButtons } from "@/app/poc/auth/auth-buttons";
 
 export default async function AuthPocPage({
   searchParams,
