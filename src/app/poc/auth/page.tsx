@@ -1,12 +1,22 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { AuthButtons } from "@/app/poc/auth/auth-buttons";
+import { Button } from "@/components/ui/button";
+
+function sanitizeNext(path: string | undefined): string {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) {
+    return "/poc/auth";
+  }
+  return path;
+}
 
 export default async function AuthPocPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, next: nextParam } = await searchParams;
+  const next = sanitizeNext(nextParam);
   const supabase = await createClient();
   const {
     data: { user },
@@ -20,14 +30,14 @@ export default async function AuthPocPage({
   let profileError: string | null = null;
 
   if (user) {
-    const { data, error } = await supabase
+    const { data, error: dbError } = await supabase
       .from("profiles")
       .select("email, display_name, created_at")
       .eq("id", user.id)
       .single();
 
-    if (error) {
-      profileError = error.message;
+    if (dbError) {
+      profileError = dbError.message;
     } else {
       profile = data;
     }
@@ -46,20 +56,26 @@ export default async function AuthPocPage({
         </p>
       )}
 
-      <AuthButtons email={user?.email} />
+      <AuthButtons email={user?.email} nextPath={next} />
+
+      {user && next !== "/poc/auth" && (
+        <Button asChild variant="outline">
+          <Link href={next}>Continue to {next}</Link>
+        </Button>
+      )}
 
       <footer className="text-sm text-muted-foreground">
-      {user && profile && (
-        <div className="rounded border p-4 text-sm space-y-1">
-          <p className="font-medium">From database (RLS-protected):</p>
-          <p>Display name: {profile.display_name ?? "—"}</p>
-          <p>Email: {profile.email}</p>
-          <p>Member since: {new Date(profile.created_at).toLocaleString()}</p>
-        </div>
-      )}
-      {profileError && (
-        <p className="text-sm text-destructive">DB error: {profileError}</p>
-      )}
+        {user && profile && (
+          <div className="rounded border p-4 text-sm space-y-1">
+            <p className="font-medium">From database (RLS-protected):</p>
+            <p>Display name: {profile.display_name ?? "—"}</p>
+            <p>Email: {profile.email}</p>
+            <p>Member since: {new Date(profile.created_at).toLocaleString()}</p>
+          </div>
+        )}
+        {profileError && (
+          <p className="text-sm text-destructive">DB error: {profileError}</p>
+        )}
       </footer>
     </main>
   );
