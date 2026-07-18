@@ -6,17 +6,27 @@ import { createClient } from "@/lib/supabase/client";
 
 type Props = {
   email?: string | null;
+  /** Safe relative path to return to after OAuth (defaults to /poc/auth). */
+  nextPath?: string;
 };
 
-export function AuthButtons({ email }: Props) {
+function sanitizeNext(path: string | undefined): string {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) {
+    return "/poc/auth";
+  }
+  return path;
+}
+
+export function AuthButtons({ email, nextPath }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const next = sanitizeNext(nextPath);
 
   async function signInWithGoogle() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/poc/auth`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     });
   }
